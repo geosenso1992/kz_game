@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../providers/hunt_game_state.dart';
 import '../services/audio_service.dart';
 import '../widgets/game_top_bar.dart';
+import '../widgets/responsive.dart';
 import '../widgets/subtle_logo.dart';
 import 'navigation_helpers.dart';
 import 'speluitleg_screen.dart';
@@ -91,6 +92,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final game = context.watch<HuntGameState>();
+    final scale = responsiveScale(context);
     final showContinue =
         game.hasStartedSpeurtocht && game.remainingSeconds < 4500 && !game.isMapLocked;
 
@@ -111,15 +113,15 @@ class HomeScreen extends StatelessWidget {
                 Expanded(
                   child: Center(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      padding: EdgeInsets.symmetric(horizontal: 24 * scale, vertical: 14 * scale),
                       child: Column(
                         children: [
                           Image.asset(
                             'assets/logo.png',
-                            width: 224,
+                            width: 224 * scale,
                             fit: BoxFit.contain,
                           ),
-                          const SizedBox(height: 18),
+                          SizedBox(height: 18 * scale),
                           _homeButton(
                             context,
                             label: 'Start nu de Speurtocht!',
@@ -142,7 +144,7 @@ class HomeScreen extends StatelessWidget {
                               onTap: () => openTopTab(context, GameTopTab.map),
                             ),
                           ],
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12 * scale),
                           _homeButton(
                             context,
                             label: 'Speluitleg',
@@ -154,7 +156,7 @@ class HomeScreen extends StatelessWidget {
                               );
                             },
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12 * scale),
                           _homeButton(
                             context,
                             label: 'Deel speurtocht',
@@ -162,7 +164,7 @@ class HomeScreen extends StatelessWidget {
                             color: const Color(0xFF8E24AA),
                             onTap: () => _openShareSheet(context),
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12 * scale),
                           _homeButton(
                             context,
                             label: 'Afsluiten',
@@ -193,6 +195,7 @@ class HomeScreen extends StatelessWidget {
     required VoidCallback onTap,
     double verticalPadding = 14,
   }) {
+    final scale = responsiveScale(context);
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
@@ -200,16 +203,16 @@ class HomeScreen extends StatelessWidget {
           AudioService.instance.playClickButton();
           onTap();
         },
-        icon: Icon(icon, size: 24),
+        icon: Icon(icon, size: 24 * scale),
         label: Text(
           label,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+          style: TextStyle(fontSize: 18 * scale, fontWeight: FontWeight.w800),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: verticalPadding),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          padding: EdgeInsets.symmetric(vertical: verticalPadding * scale),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16 * scale)),
           elevation: 1.5,
         ).copyWith(
           animationDuration: const Duration(milliseconds: 150),

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../providers/hunt_game_state.dart';
 import '../services/audio_service.dart';
 import '../widgets/game_top_bar.dart';
+import '../widgets/responsive.dart';
 import '../widgets/subtle_logo.dart';
 import 'navigation_helpers.dart';
 
@@ -63,10 +64,13 @@ class CollectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scale = responsiveScale(context);
+    final width = MediaQuery.of(context).size.width;
     final game = context.watch<HuntGameState>();
     final captured = game.gevangenPerDier;
     final discovered = _animals.where((a) => _capturedCount(captured, a.id) > 0).length;
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final crossAxisCount = width > 1000 ? 3 : 2;
 
     return Scaffold(
       body: SafeArea(
@@ -81,29 +85,29 @@ class CollectionScreen extends StatelessWidget {
                   currentTab: GameTopTab.collection,
                   onTabSelected: (tab) => openTopTab(context, tab),
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: 8 * scale),
+                Text(
                   'Bosdier',
                   style: TextStyle(
-                    color: Color(0xFF4D331D),
-                    fontSize: 24,
+                    color: const Color(0xFF4D331D),
+                    fontSize: 24 * scale,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
                 Text(
                   'Ontdekt: $discovered/${_animals.length}',
-                  style: const TextStyle(color: Color(0xFF6B4B2A), fontWeight: FontWeight.w700),
+                  style: TextStyle(color: const Color(0xFF6B4B2A), fontWeight: FontWeight.w700, fontSize: 14 * scale),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8 * scale),
                 Expanded(
                   child: GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 18),
+                    padding: EdgeInsets.fromLTRB(12 * scale, 4 * scale, 12 * scale, 18 * scale),
                     itemCount: _animals.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: isLandscape ? 1.12 : 0.9,
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 10 * scale,
+                      mainAxisSpacing: 10 * scale,
+                      childAspectRatio: width > 1000 ? 1.25 : isLandscape ? 1.12 : 0.9,
                     ),
                     itemBuilder: (context, index) {
                       final animal = _animals[index];
@@ -112,7 +116,7 @@ class CollectionScreen extends StatelessWidget {
                       return Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12 * scale),
                           onTap: () {
                             AudioService.instance.playClickButton();
                             if (!unlocked) return;
@@ -120,6 +124,7 @@ class CollectionScreen extends StatelessWidget {
                             _openAnimalDetails(context, animal, unlocked, count);
                           },
                           child: _animalCard(
+                            context,
                             animal,
                             unlocked,
                             count,
@@ -164,6 +169,7 @@ class CollectionScreen extends StatelessWidget {
                       width: MediaQuery.of(context).size.width - 28,
                       height: MediaQuery.of(context).size.height - 28,
                       child: _animalCard(
+                        context,
                         animal,
                         unlocked,
                         count,
@@ -213,20 +219,22 @@ class CollectionScreen extends StatelessWidget {
   }
 
   Widget _animalCard(
+    BuildContext context,
     _AnimalEntry animal,
     bool unlocked,
     int count, {
     required bool expanded,
   }) {
+    final scale = responsiveScale(context);
     final rarityColor = _rarityColor(animal.rarity);
     return Container(
       padding: expanded
-          ? const EdgeInsets.fromLTRB(14, 14, 14, 14)
-          : const EdgeInsets.fromLTRB(8, 8, 8, 8),
+          ? EdgeInsets.fromLTRB(14 * scale, 14 * scale, 14 * scale, 14 * scale)
+          : EdgeInsets.fromLTRB(8 * scale, 8 * scale, 8 * scale, 8 * scale),
       decoration: BoxDecoration(
         color: const Color(0xFFF8F0DF).withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(expanded ? 18 : 12),
-        border: Border.all(color: rarityColor, width: animal.rarity == _AnimalRarity.mystic ? 2.0 : 1.4),
+        borderRadius: BorderRadius.circular(expanded ? 18 * scale : 12 * scale),
+        border: Border.all(color: rarityColor, width: animal.rarity == _AnimalRarity.mystic ? 2.0 * scale : 1.4 * scale),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -237,20 +245,20 @@ class CollectionScreen extends StatelessWidget {
             style: TextStyle(
               color: rarityColor,
               fontWeight: FontWeight.w900,
-              fontSize: expanded ? 12 : 8,
+              fontSize: expanded ? 12 * scale : 8 * scale,
             ),
           ),
-          SizedBox(height: expanded ? 6 : 3),
+          SizedBox(height: expanded ? 6 * scale : 3 * scale),
           SizedBox(
-            height: expanded ? 170 : 104,
+            height: expanded ? 170 * scale : 104 * scale,
             child: _framedImage(
               animal.id,
               unlocked,
-              scale: expanded ? 1.9 : 1.5,
-              size: expanded ? 120 : 86,
+              scale: expanded ? 1.9 * scale : 1.5 * scale,
+              size: expanded ? 120 * scale : 86 * scale,
             ),
           ),
-          SizedBox(height: expanded ? 0 : 1),
+          SizedBox(height: expanded ? 0 : 1 * scale),
           _maybeBlurred(
             blurred: !unlocked,
             child: Text(
@@ -258,14 +266,14 @@ class CollectionScreen extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: expanded ? 24 : 14,
+                fontSize: expanded ? 24 * scale : 14 * scale,
                 fontWeight: FontWeight.w900,
                 color: unlocked ? const Color(0xFF3B2818) : const Color(0xFF8A775F),
               ),
             ),
           ),
           if (expanded) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: 8 * scale),
             _maybeBlurred(
               blurred: !unlocked,
               child: Align(
@@ -276,28 +284,28 @@ class CollectionScreen extends StatelessWidget {
                     _fact(
                       'Levensverwachting',
                       unlocked ? animal.lifeSpan : '???',
-                      fontSize: 14,
+                      fontSize: 14 * scale,
                     ),
                     _fact(
                       'Type',
                       unlocked ? animal.type : '???',
-                      fontSize: 14,
+                      fontSize: 14 * scale,
                     ),
                     _fact(
                       'Habitat',
                       unlocked ? animal.habitat : '???',
-                      fontSize: 14,
+                      fontSize: 14 * scale,
                     ),
                     _fact(
                       'Nakomelingen',
                       unlocked ? animal.offspring : '???',
-                      fontSize: 14,
+                      fontSize: 14 * scale,
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12 * scale),
             _maybeBlurred(
               blurred: !unlocked,
               child: Text(
@@ -305,11 +313,11 @@ class CollectionScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 7,
                 overflow: TextOverflow.visible,
-                style: const TextStyle(
-                  fontSize: 15,
+                style: TextStyle(
+                  fontSize: 15 * scale,
                   height: 1.2,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF5D412C),
+                  color: const Color(0xFF5D412C),
                 ),
               ),
             ),
@@ -321,7 +329,7 @@ class CollectionScreen extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 9,
+                fontSize: 9 * scale,
                 height: 1.2,
                 fontWeight: FontWeight.w700,
                 color: unlocked ? const Color(0xFF5D412C) : const Color(0xFF8A775F),

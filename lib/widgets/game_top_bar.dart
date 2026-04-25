@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/hunt_game_state.dart';
 import '../screens/navigation_helpers.dart';
+import 'responsive.dart';
 
 class GameTopBar extends StatelessWidget {
   final GameTopTab currentTab;
@@ -37,34 +38,38 @@ class GameTopBar extends StatelessWidget {
       });
     }
 
+    final scale = responsiveScale(context);
+
     return Container(
-      margin: const EdgeInsets.fromLTRB(10, 8, 10, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      height: 54,
+      margin: EdgeInsets.fromLTRB(10 * scale, 8 * scale, 10 * scale, 0),
+      padding: EdgeInsets.symmetric(horizontal: 6 * scale),
+      height: 54 * scale,
       decoration: BoxDecoration(
         color: const Color(0xFFF8EED8).withValues(alpha: 0.96),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFD7C29A), width: 1.0),
+        borderRadius: BorderRadius.circular(14 * scale),
+        border: Border.all(color: const Color(0xFFD7C29A), width: 1.0 * scale),
       ),
       child: Row(
         children: [
-          _item(icon: Icons.home, tab: GameTopTab.home),
-          const SizedBox(width: 8),
-          _item(icon: Icons.public, tab: GameTopTab.map),
-          const SizedBox(width: 8),
+          _item(icon: Icons.home, tab: GameTopTab.home, scale: scale),
+          SizedBox(width: 8 * scale),
+          _item(icon: Icons.public, tab: GameTopTab.map, scale: scale),
+          SizedBox(width: 8 * scale),
           _item(
             icon: Icons.pets,
             tab: GameTopTab.collection,
             showBadge: game.hasNewFaunaUnlock,
+            scale: scale,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8 * scale),
           _item(
             icon: Icons.emoji_events,
             tab: GameTopTab.finalWord,
             showBadge: game.hasNewFinalWordUnlock,
+            scale: scale,
           ),
           const Spacer(),
-          _timerPill(game),
+          _timerPill(game, scale),
         ],
       ),
     );
@@ -73,6 +78,7 @@ class GameTopBar extends StatelessWidget {
   Widget _item({
     required IconData icon,
     required GameTopTab tab,
+    required double scale,
     bool showBadge = false,
   }) {
     final selected = currentTab == tab;
@@ -81,7 +87,7 @@ class GameTopBar extends StatelessWidget {
         onTabSelected(tab);
       },
       padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+      constraints: BoxConstraints(minWidth: 36 * scale, minHeight: 36 * scale),
       visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
       icon: Stack(
         clipBehavior: Clip.none,
@@ -89,20 +95,20 @@ class GameTopBar extends StatelessWidget {
           Icon(
             icon,
             color: selected ? const Color(0xFF4D331D) : const Color(0xFF8D6A4A),
-            size: 28,
+            size: 28 * scale,
           ),
           if (showBadge)
-            const Positioned(
-              right: -2,
-              top: -3,
-              child: _TopBarBadge(),
+            Positioned(
+              right: -2 * scale,
+              top: -3 * scale,
+              child: _TopBarBadge(scale: scale),
             ),
         ],
       ),
     );
   }
 
-  Widget _timerPill(HuntGameState game) {
+  Widget _timerPill(HuntGameState game, double scale) {
     final color = game.remainingSeconds <= 600
         ? const Color(0xFFC62828)
         : game.remainingSeconds <= 1800
@@ -110,18 +116,18 @@ class GameTopBar extends StatelessWidget {
             : const Color(0xFF0B5D1E);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 9 * scale, vertical: 6 * scale),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white70, width: 0.8),
+        borderRadius: BorderRadius.circular(10 * scale),
+        border: Border.all(color: Colors.white70, width: 0.8 * scale),
       ),
       child: Text(
         game.remainingTimeLabel,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w900,
-          fontSize: 12,
+          fontSize: 12 * scale,
           letterSpacing: 0.3,
         ),
       ),
@@ -130,24 +136,26 @@ class GameTopBar extends StatelessWidget {
 }
 
 class _TopBarBadge extends StatelessWidget {
-  const _TopBarBadge();
+  final double scale;
+
+  const _TopBarBadge({required this.scale});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 14,
-      height: 14,
+      width: 14 * scale,
+      height: 14 * scale,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: const Color(0xFFC62828),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white, width: 1),
+        borderRadius: BorderRadius.circular(20 * scale),
+        border: Border.all(color: Colors.white, width: 1 * scale),
       ),
-      child: const Text(
+      child: Text(
         '!',
         style: TextStyle(
           color: Colors.white,
-          fontSize: 10,
+          fontSize: 10 * scale,
           fontWeight: FontWeight.w900,
           height: 1,
         ),

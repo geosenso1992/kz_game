@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/hunt_game_state.dart';
+import '../services/audio_service.dart';
 import 'home_screen.dart';
 import 'theme_login_screen.dart';
 
@@ -15,10 +16,20 @@ class RootRouterScreen extends StatefulWidget {
 class _RootRouterScreenState extends State<RootRouterScreen> {
   bool _minSplashDone = false;
 
+  // 🔊 Audio fix
+  bool _audioStarted = false;
+
+  void _startAudioOnce() {
+    if (_audioStarted) return;
+    _audioStarted = true;
+    AudioService.instance.startBackgroundMusic();
+  }
+
   @override
   void initState() {
     super.initState();
     print('[RootRouter] initState - startup screen showing for 5 seconds');
+
     Future<void>.delayed(const Duration(seconds: 5), () {
       if (!mounted) return;
       print('[RootRouter] 5 seconds elapsed, hiding startup screen');
@@ -28,18 +39,22 @@ class _RootRouterScreenState extends State<RootRouterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HuntGameState>(
-      builder: (context, game, _) {
-        if (!_minSplashDone || !game.isHydrated) {
-          return const _StartupLoadScreen();
-        }
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _startAudioOnce, // 🔥 audio start bij eerste klik
+      child: Consumer<HuntGameState>(
+        builder: (context, game, _) {
+          if (!_minSplashDone || !game.isHydrated) {
+            return const _StartupLoadScreen();
+          }
 
-        if (!game.hasProfiel) {
-          return const ThemeLoginScreen();
-        }
+          if (!game.hasProfiel) {
+            return const ThemeLoginScreen();
+          }
 
-        return const HomeScreen();
-      },
+          return const HomeScreen();
+        },
+      ),
     );
   }
 }
@@ -51,6 +66,7 @@ class _StartupLoadScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
+
     final asset = isLandscape
         ? 'assets/loadscreen_landscape.png'
         : 'assets/loadscreen_portrait.png';
@@ -88,7 +104,8 @@ class _StartupLoadScreen extends StatelessWidget {
                       height: 16,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.1,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     ),
                     SizedBox(width: 10),

@@ -5,9 +5,13 @@ import 'providers/hunt_game_state.dart';
 import 'services/audio_service.dart';
 import 'screens/root_router_screen.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await AudioService.instance.startBackgroundMusic();
+
+  FlutterError.onError = (details) {
+    print("ERROR: ${details.exception}");
+  };
+
   runApp(const SpeurtochtApp());
 }
 
